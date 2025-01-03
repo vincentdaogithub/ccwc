@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Objects;
 
-public enum CCWC {
+enum CCWC {      // NOSONAR
 
     INSTANCE;
 
@@ -30,10 +30,11 @@ public enum CCWC {
 
     private static final int UTF_8_4TH_BYTE_MASK = 0b11111000;
     private static final int UTF_8_4TH_BYTE_INDICATOR = 0b11110000;
+    private static final String INPUT_STREAM_MUST_NOT_BE_NULL = "InputStream must not be null";
 
     public long countBytes(InputStream inputStream) throws IOException {
         try (inputStream) {
-            Objects.requireNonNull(inputStream, "InputStream must not be null");
+            Objects.requireNonNull(inputStream, INPUT_STREAM_MUST_NOT_BE_NULL);
 
             long bytesCounted = 0;
             byte[] buffer = new byte[BUFFER_SIZE];
@@ -49,12 +50,12 @@ public enum CCWC {
 
     public long countLines(InputStream inputStream) throws IOException {
         try (inputStream) {
-            Objects.requireNonNull(inputStream, "InputStream must not be null");
+            Objects.requireNonNull(inputStream, INPUT_STREAM_MUST_NOT_BE_NULL);
 
             long linesCounted = 0;
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                while (reader.readLine() != null) {
+                while (reader.readLine() != null) {     // NOSONAR
                     linesCounted++;
                 }
             }
@@ -65,21 +66,20 @@ public enum CCWC {
 
     public long countWords(InputStream inputStream) throws IOException {
         try (inputStream) {
-            Objects.requireNonNull(inputStream, "InputStream must not be null");
+            Objects.requireNonNull(inputStream, INPUT_STREAM_MUST_NOT_BE_NULL);
 
             long wordsCounted = 0;
             boolean isReadingWord = false;
             int byteRead;
 
             while ((byteRead = inputStream.read()) != EOF) {
-                switch (byteRead) {
-                    case NEW_LINE, SPACE, TAB, CARRIAGE_RETURN -> {
-                        if (isReadingWord) {
-                            wordsCounted++;
-                            isReadingWord = false;
-                        }
+                if (byteRead == NEW_LINE || byteRead == SPACE || byteRead == TAB || byteRead == CARRIAGE_RETURN) {
+                    if (isReadingWord) {
+                        wordsCounted++;
+                        isReadingWord = false;
                     }
-                    default -> isReadingWord = true;
+                } else {
+                    isReadingWord = true;
                 }
             }
 
@@ -93,7 +93,7 @@ public enum CCWC {
 
     public long countCharacters(InputStream inputStream) throws IOException {
         try (inputStream) {
-            Objects.requireNonNull(inputStream, "InputStream must not be null");
+            Objects.requireNonNull(inputStream, INPUT_STREAM_MUST_NOT_BE_NULL);
 
             long charactersCounted = 0;
             int codePointBytesLeft;
